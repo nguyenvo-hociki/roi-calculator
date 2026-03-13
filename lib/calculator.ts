@@ -32,7 +32,7 @@ const GRID_SERVICES = 5000
 export function calculateROI(input: CalcInput): CalcResult {
   const state = getStateFromZip(input.zip) ?? "Unknown"
   const totalBatterySize = input.batterySize * input.quantity
-  const usableEnergy = input.batterySize * DOD * RTE
+  const usableEnergy = totalBatterySize * DOD * RTE
 
   const dailySavings =
     usableEnergy * (input.priceInDaytime - input.priceAtNighttime)

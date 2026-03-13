@@ -15,6 +15,17 @@ export default function ROICalculator() {
 
   //result
   const [result, setResult] = useState<CalcResult | null>(null)
+  const [showResultDetails, setShowResultDetails] = useState(false)
+  
+  //input label
+  const labelClassName = "block text-sm font-semibold text-foreground mb-2"
+  const inputClassName =
+  "w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+  const resultCardClassName =
+  "bg-secondary/10 border-l-4 border-primary rounded-lg p-4"
+  const resultLabelClassName =
+    "text-xs lg:text-sm text-foreground font-medium mb-1"
+  const resultText = "text-lg lg:text-xl font-bold text-primary"
 
   // call API
   async function calculate() {
@@ -42,6 +53,7 @@ export default function ROICalculator() {
         <h2 className="text-4xl font-bold mb-2 text-foreground">
           Energy Storage ROI Calculator
         </h2>
+        
         <p className="text-foreground opacity-70">
           Calculate return on investment for your battery energy storage system
         </p>
@@ -51,11 +63,12 @@ export default function ROICalculator() {
         {/* Input Section */}
         <div className="w-full xl:w-1/3 bg-white rounded-lg shadow-lg p-8 border border-secondary">
           <h3 className="text-2xl font-bold mb-6 text-foreground">
-            Parameters
+            Type your electricty usage
           </h3>
+          {/* Detail of usage */}
           <div className="space-y-6 mb-8">
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label className={labelClassName}>
                 Your Zip Code
               </label>
               <input
@@ -64,18 +77,18 @@ export default function ROICalculator() {
                 maxLength={5}
                 value={zip}
                 onChange={(e) => setZip(e.target.value.replace(/\D/g, ""))}
-                className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+                className={inputClassName}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label className={labelClassName}>
                 Battery Size (kWh)
               </label>
               <select
                 value={batterySize}
                 onChange={(e) => setBatterySize(Number(e.target.value))}
-                className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+                className={inputClassName}
               >
                 <option value={297}>297</option>
                 <option value={594}>594</option>
@@ -86,7 +99,7 @@ export default function ROICalculator() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label className={labelClassName}>
                 Quantity
               </label>
               <input
@@ -100,12 +113,12 @@ export default function ROICalculator() {
                     setQuantity(digits)
                   }
                 }}
-                className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+                className={inputClassName}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label className={labelClassName}>
                 Charging Days Per Year
               </label>
               <input
@@ -118,12 +131,12 @@ export default function ROICalculator() {
                   setChargingDaysPerYear(digits)
                   }
                 }}
-                className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+                className={inputClassName}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label className={labelClassName}>
                 Peak Price ($/kWh)
               </label>
               <input
@@ -131,12 +144,12 @@ export default function ROICalculator() {
                 step="0.01"
                 value={priceInDaytime}
                 onChange={(e) => setPriceInDaytime(Number(e.target.value))}
-                className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+                className={inputClassName}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label className={labelClassName}>
                 Off Peak Price ($/kWh)
               </label>
               <input
@@ -144,11 +157,11 @@ export default function ROICalculator() {
                 step="0.01"
                 value={priceAtNighttime}
                 onChange={(e) => setPriceAtNighttime(Number(e.target.value))}
-                className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+                className={inputClassName}
               />
             </div>
           </div>
-
+          {/* On click */}
           <button
             onClick={calculate}
             className="w-full bg-primary text-foreground font-bold py-4 px-6 rounded-lg hover:opacity-90 transition-all duration-200 shadow-lg">
@@ -159,45 +172,92 @@ export default function ROICalculator() {
         {/* Results Section */}
         {result && (
           <div className="w-full xl:w-2/3 bg-white rounded-lg shadow-lg p-8 border border-secondary">
-            <h2 className="text-2xl font-bold mb-6 text-foreground">Results</h2>
+            <div className="mb-6">
+              
+              <div className="flex items-center gap-3 flex-wrap">
+                <h2 className="text-2xl font-bold text-foreground">Results</h2>
+                {/* Show or Hide detail */}
+                <button
+                  type="button"
+                  onClick={() => setShowResultDetails(!showResultDetails)}
+                  className="text-sm font-semibold text-primary underline underline-offset-2 hover:opacity-80"
+                >
+                  {showResultDetails ? "Hide details" : "Click to know details"}
+                </button>
+              </div>
+
+              {showResultDetails && (
+                <div className="mt-3 w-full max-w-2xl rounded-lg border border-secondary bg-white shadow-xl p-4">
+                  {/* Explaination of outputs*/}
+                  <div className="text-base text-foreground space-y-2">
+                    <p>
+                      <span className="font-semibold">System Cost:</span> One-time total
+                      upfront battery system cost per quantity before incentives.
+                    </p>
+
+                    <p>
+                      <span className="font-semibold">Incentives:</span> One-time tax
+                      incentives and benefits per quantity that reduce upfront cost.
+                    </p>
+
+                    <p>
+                      <span className="font-semibold">Annual Costs:</span> Yearly
+                      operating and maintenance expenses.
+                    </p>
+
+                    <p>
+                      <span className="font-semibold">Net Annual Cashflow:</span> Energy 
+                      arbitrage savings from daily peak/off-peak price plus estimated
+                      grid services revenue, minus annual operating costs.
+                    </p>
+
+                    <p>
+                      <span className="font-semibold">Payback Period:</span> (System
+                      Cost - Incentives) ÷ Net Annual Cashflow.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <p className="text-sm text-foreground opacity-70 mb-6">
               Your State: {result.state || "unknown"}
             </p>
-
+            {/* Outputs Label*/}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="bg-secondary/10 border-l-4 border-primary rounded-lg p-4">
-                <p className="text-xs lg:text-sm text-foreground font-medium mb-1">
+              <div className={resultCardClassName}>
+                <p className={resultLabelClassName}>
                   System Cost
                 </p>
-                <p className="text-lg lg:text-xl font-bold text-primary">
+                <p className={resultText}>
                   ${result.systemCost.toLocaleString()}
                 </p>
               </div>
 
-              <div className="bg-secondary/10 border-l-4 border-primary rounded-lg p-4">
-                <p className="text-xs lg:text-sm text-foreground font-medium mb-1">
+              <div className={resultCardClassName}>
+                <p className={resultLabelClassName}>
                   Incentives
                 </p>
-                <p className="text-lg lg:text-xl font-bold text-primary">
+                <p className={resultText}>
                   ${result.incentives.toLocaleString()}
                 </p>
               </div>
 
-              <div className="bg-secondary/10 border-l-4 border-primary rounded-lg p-4">
-                <p className="text-xs lg:text-sm text-foreground font-medium mb-1">
-                  Net Annual Cashflow
+              <div className={resultCardClassName}>
+                <p className={resultLabelClassName}>
+                  Annual Costs
                 </p>
-                <p className="text-lg lg:text-xl font-bold text-primary">
-                  ${result.netAnnualCashflow.toLocaleString()}
+                <p className={resultText}>
+                  ${result.annualOpex.toLocaleString()}
                 </p>
               </div>
 
-              <div className="bg-secondary/10 border-l-4 border-primary rounded-lg p-4">
-                <p className="text-xs lg:text-sm text-foreground font-medium mb-1">
-                  Annual Costs
+              <div className={resultCardClassName}>
+                <p className={resultLabelClassName}>
+                  Net Annual Cashflow
                 </p>
-                <p className="text-lg lg:text-xl font-bold text-primary">
-                  ${result.annualOpex.toLocaleString()}
+                <p className={resultText}>
+                  ${result.netAnnualCashflow.toLocaleString()}
                 </p>
               </div>
             </div>
