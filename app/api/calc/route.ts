@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { calculateROI, CalcInput, CalcResult } from "../../lib/calculator"
+import { calculateROI, CalcInput, CalcResult } from "../../../lib/calculator"
 
 export async function POST(req: NextRequest) {
   try {

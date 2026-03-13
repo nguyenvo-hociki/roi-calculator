@@ -6,10 +6,11 @@ import PaybackChart from "./PaybackChart" // Import the chart component
 
 export default function ROICalculator() {
   //input
-  const [batterySize, setBatterySize] = useState(200)
+  const [batterySize, setBatterySize] = useState(297)
+  const [quantity, setQuantity] = useState("1")
   const [priceInDaytime, setPriceInDaytime] = useState(0.4)
   const [priceAtNighttime, setPriceAtNighttime] = useState(0.1)
-  const [chargingDaysPerYear, setChargingDaysPerYear] = useState(150)
+  const [chargingDaysPerYear, setChargingDaysPerYear] = useState("150")
   const [zip, setZip] = useState("75001")
 
   //result
@@ -17,13 +18,14 @@ export default function ROICalculator() {
 
   // call API
   async function calculate() {
-    const res = await fetch("/api-calc", {
+    const res = await fetch("/api/calc", {
       //call back-end route
       method: "POST", //sending POST request
       headers: { "Content-Type": "application/json" }, //the request's content is JSON
       body: JSON.stringify({
         zip,
         batterySize,
+        quantity,
         priceInDaytime,
         priceAtNighttime,
         chargingDaysPerYear,
@@ -58,8 +60,10 @@ export default function ROICalculator() {
               </label>
               <input
                 type="text"
+                inputMode="numeric"
+                maxLength={5}
                 value={zip}
-                onChange={(e) => setZip(e.target.value)}
+                onChange={(e) => setZip(e.target.value.replace(/\D/g, ""))}
                 className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
               />
             </div>
@@ -68,10 +72,34 @@ export default function ROICalculator() {
               <label className="block text-sm font-semibold text-foreground mb-2">
                 Battery Size (kWh)
               </label>
-              <input
-                type="number"
+              <select
                 value={batterySize}
                 onChange={(e) => setBatterySize(Number(e.target.value))}
+                className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
+              >
+                <option value={297}>297</option>
+                <option value={594}>594</option>
+                <option value={891}>891</option>
+                <option value={1188}>1188</option>
+                <option value={1485}>1485</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-foreground mb-2">
+                Quantity
+              </label>
+              <input
+                type="text"
+                min="1"
+                inputMode="numeric"
+                value={quantity}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, "")
+                  if (digits === "" || Number(digits) >= 1) {
+                    setQuantity(digits)
+                  }
+                }}
                 className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
               />
             </div>
@@ -81,11 +109,15 @@ export default function ROICalculator() {
                 Charging Days Per Year
               </label>
               <input
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={chargingDaysPerYear}
-                onChange={(e) =>
-                  setChargingDaysPerYear(Number(e.target.value))
-                }
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, "")
+                  if (digits === "" || (Number(digits) >= 1 && Number(digits) <= 366)) {
+                  setChargingDaysPerYear(digits)
+                  }
+                }}
                 className="w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
               />
             </div>
