@@ -1,12 +1,12 @@
 "use client"
 
+import { Tooltip } from "./ui/tooltip-card"
 import { useState } from "react"
 import { CalcResult } from "../../lib/calculator"
 import PaybackChart from "./PaybackChart" // Import the chart component
 
 export default function ROICalculator() {
   //input
-  const [batterySize, setBatterySize] = useState(297)
   const [quantity, setQuantity] = useState("1")
   const [priceInDaytime, setPriceInDaytime] = useState(0.4)
   const [priceAtNighttime, setPriceAtNighttime] = useState(0.1)
@@ -15,14 +15,13 @@ export default function ROICalculator() {
 
   //result
   const [result, setResult] = useState<CalcResult | null>(null)
-  const [showResultDetails, setShowResultDetails] = useState(false)
   
   //input label
   const labelClassName = "block text-sm font-semibold text-foreground mb-2"
   const inputClassName =
   "w-full px-4 py-3 border-2 border-secondary rounded-lg focus:outline-none focus:border-primary bg-secondary/20 transition-all font-medium text-foreground"
   const resultCardClassName =
-  "bg-secondary/10 border-l-4 border-primary rounded-lg p-4"
+  "bg-white border-l-4 border-primary rounded-lg p-4"
   const resultLabelClassName =
     "text-xs lg:text-sm text-foreground font-medium mb-1"
   const resultText = "text-lg lg:text-xl font-bold text-primary"
@@ -35,7 +34,6 @@ export default function ROICalculator() {
       headers: { "Content-Type": "application/json" }, //the request's content is JSON
       body: JSON.stringify({
         zip,
-        batterySize,
         quantity,
         priceInDaytime,
         priceAtNighttime,
@@ -65,6 +63,9 @@ export default function ROICalculator() {
           <h3 className="text-2xl font-bold mb-6 text-foreground">
             Type your electricty usage
           </h3>
+           <p className="text-base text-foreground opacity-80 mt-0.5 mb-3">
+            Battery Size: 279 kWh
+          </p>
           {/* Detail of usage */}
           <div className="space-y-6 mb-8">
             <div>
@@ -80,31 +81,12 @@ export default function ROICalculator() {
                 className={inputClassName}
               />
             </div>
-
-            <div>
-              <label className={labelClassName}>
-                Battery Size (kWh)
-              </label>
-              <select
-                value={batterySize}
-                onChange={(e) => setBatterySize(Number(e.target.value))}
-                className={inputClassName}
-              >
-                <option value={297}>297</option>
-                <option value={594}>594</option>
-                <option value={891}>891</option>
-                <option value={1188}>1188</option>
-                <option value={1485}>1485</option>
-              </select>
-            </div>
-
             <div>
               <label className={labelClassName}>
                 Quantity
               </label>
               <input
                 type="text"
-                min="1"
                 inputMode="numeric"
                 value={quantity}
                 onChange={(e) => {
@@ -116,7 +98,6 @@ export default function ROICalculator() {
                 className={inputClassName}
               />
             </div>
-
             <div>
               <label className={labelClassName}>
                 Charging Days Per Year
@@ -134,7 +115,6 @@ export default function ROICalculator() {
                 className={inputClassName}
               />
             </div>
-
             <div>
               <label className={labelClassName}>
                 Peak Price ($/kWh)
@@ -147,7 +127,6 @@ export default function ROICalculator() {
                 className={inputClassName}
               />
             </div>
-
             <div>
               <label className={labelClassName}>
                 Off Peak Price ($/kWh)
@@ -161,6 +140,7 @@ export default function ROICalculator() {
               />
             </div>
           </div>
+          
           {/* On click */}
           <button
             onClick={calculate}
@@ -171,98 +151,88 @@ export default function ROICalculator() {
 
         {/* Results Section */}
         {result && (
-          <div className="w-full xl:w-2/3 bg-white rounded-lg shadow-lg p-8 border border-secondary">
-            <div className="mb-6">
-              
-              <div className="flex items-center gap-3 flex-wrap">
-                <h2 className="text-2xl font-bold text-foreground">Results</h2>
-                {/* Show or Hide detail */}
-                <button
-                  type="button"
-                  onClick={() => setShowResultDetails(!showResultDetails)}
-                  className="text-sm font-semibold text-primary underline underline-offset-2 hover:opacity-80"
-                >
-                  {showResultDetails ? "Hide details" : "Click to know details"}
-                </button>
-              </div>
+        <div className="w-full xl:w-2/3 bg-white rounded-lg shadow-lg p-8 border border-secondary">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-foreground">Results</h2>
+          </div>
 
-              {showResultDetails && (
-                <div className="mt-3 w-full max-w-2xl rounded-lg border border-secondary bg-white shadow-xl p-4">
-                  {/* Explaination of outputs*/}
-                  <div className="text-base text-foreground space-y-2">
-                    <p>
-                      <span className="font-semibold">System Cost:</span> One-time total
-                      upfront battery system cost per quantity before incentives.
-                    </p>
+          <p className="text-base text-foreground opacity-100 mb-6">
+            Your State: {result.state || "unknown"}
+          </p>
 
-                    <p>
-                      <span className="font-semibold">Incentives:</span> One-time tax
-                      incentives and benefits per quantity that reduce upfront cost.
-                    </p>
-
-                    <p>
-                      <span className="font-semibold">Annual Costs:</span> Yearly
-                      operating and maintenance expenses.
-                    </p>
-
-                    <p>
-                      <span className="font-semibold">Net Annual Cashflow:</span> Energy 
-                      arbitrage savings from daily peak/off-peak price plus estimated
-                      grid services revenue, minus annual operating costs.
-                    </p>
-
-                    <p>
-                      <span className="font-semibold">Payback Period:</span> (System
-                      Cost - Incentives) ÷ Net Annual Cashflow.
-                    </p>
-                  </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+            <Tooltip
+              direction="down"
+              content={
+                <div className="max-w-xs space-y-1">
+                  <p className="font-semibold">System Cost</p>
+                  <p>One-time total upfront battery system cost per quantity before incentives.</p>
                 </div>
-              )}
-            </div>
-
-            <p className="text-sm text-foreground opacity-70 mb-6">
-              Your State: {result.state || "unknown"}
-            </p>
-            {/* Outputs Label*/}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              }
+              containerClassName="z-50"
+            >
               <div className={resultCardClassName}>
-                <p className={resultLabelClassName}>
-                  System Cost
-                </p>
-                <p className={resultText}>
-                  ${result.systemCost.toLocaleString()}
-                </p>
+                <p className={resultLabelClassName}>System Cost</p>
+                <p className={resultText}>${result.systemCost.toLocaleString()}</p>
               </div>
+            </Tooltip>
 
+            <Tooltip
+              content={
+                <div className="max-w-xs space-y-1">
+                  <p className="font-semibold">Incentives</p>
+                  <p>Estimated one-time tax incentives and benefits per quantity that reduce upfront cost.</p>
+                </div>
+              }
+              containerClassName="z-50"
+            >
               <div className={resultCardClassName}>
-                <p className={resultLabelClassName}>
-                  Incentives
-                </p>
-                <p className={resultText}>
-                  ${result.incentives.toLocaleString()}
-                </p>
+                <p className={resultLabelClassName}>Incentives</p>
+                <p className={resultText}>${result.incentives.toLocaleString()}</p>
               </div>
+            </Tooltip>
 
+            <Tooltip
+              content={
+                <div className="max-w-xs space-y-1">
+                  <p className="font-semibold">Annual Costs</p>
+                  <p>Estimated yearly operating and maintenance expenses.</p>
+                </div>
+              }
+              containerClassName="z-50"
+            >
               <div className={resultCardClassName}>
-                <p className={resultLabelClassName}>
-                  Annual Costs
-                </p>
-                <p className={resultText}>
-                  ${result.annualOpex.toLocaleString()}
-                </p>
+                <p className={resultLabelClassName}>Annual Costs</p>
+                <p className={resultText}>${result.annualOpex.toLocaleString()}</p>
               </div>
+            </Tooltip>
 
+            <Tooltip
+              content={
+                <div className="max-w-xs space-y-1">
+                  <p className="font-semibold">Net Annual Cashflow</p>
+                  <p>Energy arbitrage savings from daily peak/off-peak price plus estimated grid services revenue, minus annual operating costs.</p>
+                </div>
+              }
+              containerClassName="z-50"
+            >
               <div className={resultCardClassName}>
-                <p className={resultLabelClassName}>
-                  Net Annual Cashflow
-                </p>
-                <p className={resultText}>
-                  ${result.netAnnualCashflow.toLocaleString()}
-                </p>
+                <p className={resultLabelClassName}>Net Annual Cashflow</p>
+                <p className={resultText}>${result.netAnnualCashflow.toLocaleString()}</p>
               </div>
-            </div>
+            </Tooltip>
+          </div>
 
-            <div className="bg-secondary/20 border-2 border-primary rounded-xl p-6 text-center">
+          <Tooltip
+            content={
+              <div className="max-w-xs space-y-1">
+                <p className="font-semibold">Payback Period</p>
+                <p>(System Cost - Incentives) ÷ Net Annual Cashflow.</p>
+              </div>
+            }
+            containerClassName="z-50 w-full"
+          >
+            <div className="bg-secondary/10 border-2 border-primary rounded-xl p-6 text-center cursor-default">
               <p className="text-sm text-foreground font-semibold mb-2">
                 Payback Period
               </p>
@@ -273,11 +243,12 @@ export default function ROICalculator() {
               </p>
               <p className="text-lg text-foreground font-medium mt-1">years</p>
             </div>
-
-            <div className="mt-8">
-              <PaybackChart result={result} />
-            </div>
+          </Tooltip>
+          
+          <div className="mt-8">
+            <PaybackChart result={result} />
           </div>
+        </div>
         )}
       </div>
     </div>

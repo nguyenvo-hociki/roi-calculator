@@ -3,24 +3,34 @@ import { calculateROI, CalcInput, CalcResult } from "../../../lib/calculator"
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Read JSON from frontend
-    const input: CalcInput = await req.json()
+    const body = await req.json()
 
-    // 2. Call calculator
+    const input: CalcInput = {
+      zip: String(body.zip ?? "").replace(/\D/g, "").slice(0, 5),
+      quantity: Number(body.quantity),
+      priceInDaytime: Number(body.priceInDaytime),
+      priceAtNighttime: Number(body.priceAtNighttime),
+      chargingDaysPerYear: Number(body.chargingDaysPerYear),
+    }
+
+    if (
+      input.zip.length !== 5 ||
+      !Number.isFinite(input.quantity) ||
+      input.quantity < 1 ||
+      !Number.isFinite(input.priceInDaytime) ||
+      input.priceInDaytime < 0 ||
+      !Number.isFinite(input.priceAtNighttime) ||
+      input.priceAtNighttime < 0 ||
+      !Number.isFinite(input.chargingDaysPerYear) ||
+      input.chargingDaysPerYear < 1 ||
+      input.chargingDaysPerYear > 366
+    ) {
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 })
+    }
+
     const result: CalcResult = calculateROI(input)
-
-    // 3. Return JSON
     return NextResponse.json(result)
-  
-  
-  } catch (error) {
-    return NextResponse.json({
-      state: "",
-      systemCost: 0,
-      incentives: 0,
-      annualOpex: 0,
-      netAnnualCashflow: 0,
-      paybackYears: Infinity
-    });
+  } catch {
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 })
   }
 }

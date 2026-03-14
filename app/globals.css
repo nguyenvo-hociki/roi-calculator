@@ -1,10 +1,12 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
 :root {
   --background: #ffffff;
   --foreground: #1a1a1a;
   --primary: #6bbf00;
-  --secondary: rgba(0, 0, 0, 0.07);
+  --secondary: rgba(0, 0, 0, 0.1);
 }
 
 @theme inline {
